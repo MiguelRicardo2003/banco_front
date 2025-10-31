@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { prestamoService } from '../../../services/prestamoService';
-import { cuentaService } from '../../../services/cuentaService';
+import { prestamoService } from '../services/prestamo.service';
+import { cuentaService } from '../../cuentas/services/cuenta.service';
 
 export const usePrestamos = () => {
   const [prestamos, setPrestamos] = useState([]);
