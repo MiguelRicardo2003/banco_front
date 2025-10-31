@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { movimientoService } from '../../../services/movimientoService';
-import { cuentaService } from '../../../services/cuentaService';
+import { movimientoService } from '../services/movimiento.service';
+import { cuentaService } from '../../cuentas/services/cuenta.service';
 
 export const useMovimientos = () => {
   const [movimientos, setMovimientos] = useState([]);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { cuentaService } from '../../../services/cuentaService';
-import { movimientoService } from '../../../services/movimientoService';
-import { prestamoService } from '../../../services/prestamoService';
+import { cuentaService } from '../../cuentas/services/cuenta.service';
+import { movimientoService } from '../../movimientos/services/movimiento.service';
+import { prestamoService } from '../../prestamos/services/prestamo.service';
 
 export const useDashboard = () => {
   const [cuentas, setCuentas] = useState([]);
