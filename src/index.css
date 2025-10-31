@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados del Banco BBVA */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F4F4F4;
+}
+
+/* Animaciones suaves */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Botones personalizados */
+.btn-primary {
+  @apply bg-bbva-blue text-white px-6 py-2 rounded-lg hover:bg-bbva-light-blue font-semibold;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 font-semibold;
+}
+
+/* Tarjetas */
+.card {
+  @apply bg-white rounded-xl shadow-md p-6 hover:shadow-lg;
+}
+
+/* Inputs */
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bbva-light-blue;
+}
+
+/* Tablas */
+.table-container {
+  @apply overflow-x-auto bg-white rounded-xl shadow-md;
+}
+
+table {
+  @apply w-full text-left;
+}
+
+thead {
+  @apply bg-bbva-blue text-white;
+}
+
+th {
+  @apply px-6 py-3 font-semibold;
+}
+
+td {
+  @apply px-6 py-4 border-b border-gray-200;
+}
+
+/* Solo aplicar hover a las filas del tbody, no al thead */
+tbody tr:hover {
+  @apply bg-gray-50;
+}
