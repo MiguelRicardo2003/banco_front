@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
+import { Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCuentas } from '../hooks/useCuentas';
-import Button from '../../../shared/components/Button';
-import FormInput from '../../../shared/components/FormInput';
-import FormSelect from '../../../shared/components/FormSelect';
-import Loading from '../../../shared/components/Loading';
+import Button from '@shared/components/Button';
+import FormInput from '@shared/components/FormInput';
+import FormSelect from '@shared/components/FormSelect';
+import Loading from '@shared/components/Loading';
+import Table from '@shared/components/Table';
+import { formatCurrency } from '@shared/utils/formatters';
 
 const Cuentas = () => {
   const [filtro, setFiltro] = useState('');
@@ -84,48 +87,65 @@ const Cuentas = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Número</th>
-              <th>Tipo</th>
-              <th>Sucursal</th>
-              <th>Saldo</th>
-              <th>Fecha Apertura</th>
-              <th>Titular(es)</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cuentasFiltradas.map(cuenta => (
-              <tr key={cuenta.IdCuenta}>
-                <td>{cuenta.IdCuenta}</td>
-                <td className="font-semibold">{cuenta.Numero}</td>
-                <td>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                    {cuenta.tipoCuenta?.TipoCuenta || 'N/A'}
-                  </span>
-                </td>
-                <td>{cuenta.sucursal?.Sucursal || 'N/A'}</td>
-                <td className={`font-bold ${parseFloat(cuenta.Saldo) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${parseFloat(cuenta.Saldo || 0).toLocaleString('es-CO')}
-                </td>
-                <td>{new Date(cuenta.FechaApertura).toLocaleDateString('es-ES')}</td>
-                <td>
-                  {cuenta.titulares?.map(t => t.Nombre).join(', ') || 'Sin titular'}
-                </td>
-                <td>
-                  <button className="text-bbva-light-blue hover:underline text-sm">
-                    Ver detalles
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={[
+          { key: 'IdCuenta', header: 'ID' },
+          { 
+            key: 'Numero', 
+            header: 'Número',
+            render: (value) => <span className="font-semibold">{value}</span>
+          },
+          { 
+            key: 'tipoCuenta', 
+            header: 'Tipo',
+            render: (value) => (
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                {value?.TipoCuenta || 'N/A'}
+              </span>
+            )
+          },
+          { 
+            key: 'sucursal', 
+            header: 'Sucursal',
+            render: (value) => value?.Sucursal || 'N/A'
+          },
+          { 
+            key: 'Saldo', 
+            header: 'Saldo',
+            render: (value, row) => (
+              <span className={`font-bold ${parseFloat(value) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(value)}
+              </span>
+            )
+          },
+          { 
+            key: 'FechaApertura', 
+            header: 'Fecha Apertura',
+            render: (value) => new Date(value).toLocaleDateString('es-ES')
+          },
+          { 
+            key: 'titulares', 
+            header: 'Titular(es)',
+            render: (value) => value?.map(t => t.Nombre).join(', ') || 'Sin titular'
+          },
+          {
+            key: 'actions',
+            header: 'Acciones',
+            render: (_, row) => (
+              <div className="flex gap-2 justify-center">
+                <button
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Ver detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+              </div>
+            )
+          }
+        ]}
+        data={cuentasFiltradas}
+        emptyMessage="No hay cuentas disponibles"
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

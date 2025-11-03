@@ -2,16 +2,16 @@ import { useState, useMemo } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useMovimientos } from '../hooks/useMovimientos';
-import Modal from '../../../shared/components/Modal';
-import Button from '../../../shared/components/Button';
-import Card from '../../../shared/components/Card';
-import Table from '../../../shared/components/Table';
-import Badge from '../../../shared/components/Badge';
-import FormInput from '../../../shared/components/FormInput';
-import FormSelect from '../../../shared/components/FormSelect';
-import Loading from '../../../shared/components/Loading';
-import { formatCurrency } from '../../../shared/utils/formatters';
-import { formatShortDate } from '../../../shared/utils/formatters';
+import Modal from '@shared/components/Modal';
+import Button from '@shared/components/Button';
+import Card from '@shared/components/Card';
+import Table from '@shared/components/Table';
+import Badge from '@shared/components/Badge';
+import FormInput from '@shared/components/FormInput';
+import FormSelect from '@shared/components/FormSelect';
+import Loading from '@shared/components/Loading';
+import { formatCurrency } from '@shared/utils/formatters';
+import { formatShortDate } from '@shared/utils/formatters';
 
 const Movimientos = () => {
   const [showModal, setShowModal] = useState(false);
@@ -147,45 +147,11 @@ const Movimientos = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Cuenta</th>
-              <th>Tipo</th>
-              <th>Valor</th>
-              <th>Sucursal</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movimientosFiltrados.map(mov => (
-              <tr key={mov.IdMovimiento}>
-                <td>{mov.IdMovimiento}</td>
-                <td>{new Date(mov.Fecha).toLocaleDateString('es-ES')}</td>
-                <td className="font-semibold">{mov.cuenta?.Numero || 'N/A'}</td>
-                <td>
-                  <span className={`px-2 py-1 rounded text-xs font-semibold
-                    ${mov.IdTipoMovimiento === 1 ? 'bg-green-100 text-green-800' : ''}
-                    ${mov.IdTipoMovimiento === 2 ? 'bg-red-100 text-red-800' : ''}
-                    ${mov.IdTipoMovimiento === 3 ? 'bg-blue-100 text-blue-800' : ''}
-                  `}>
-                    {mov.tipoMovimiento?.TipoMovimiento || 'N/A'}
-                  </span>
-                </td>
-                <td className={`font-bold ${mov.IdTipoMovimiento === 1 ? 'text-green-600' : 'text-red-600'}`}>
-                  {mov.IdTipoMovimiento === 1 ? '+' : '-'}
-                  ${parseFloat(mov.Valor || 0).toLocaleString('es-CO')}
-                </td>
-                <td>{mov.sucursal?.Sucursal || 'N/A'}</td>
-                <td className="text-sm text-gray-600">{mov.Descripcion || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={tableColumns}
+        data={movimientosFiltrados}
+        emptyMessage="No hay movimientos disponibles"
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

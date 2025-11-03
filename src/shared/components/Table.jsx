@@ -17,7 +17,9 @@ const Table = ({
             {columns.map((column, index) => (
               <th
                 key={column.key || index}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider"
+                className={`px-6 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider align-middle ${
+                  column.key === 'actions' ? 'text-center' : 'text-left'
+                }`}
               >
                 {column.header}
               </th>
@@ -50,12 +52,20 @@ const Table = ({
                 {columns.map((column, colIndex) => (
                   <td
                     key={column.key || colIndex}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    className={`px-6 py-4 text-sm text-gray-900 align-middle ${
+                      column.key === 'actions' 
+                        ? 'text-center' 
+                        : 'text-left whitespace-nowrap'
+                    }`}
                   >
-                    {column.render 
-                      ? column.render(row[column.key], row, rowIndex)
-                      : row[column.key]
-                    }
+                    <div className={`flex items-center ${
+                      column.key === 'actions' ? 'justify-center' : ''
+                    }`}>
+                      {column.render 
+                        ? column.render(row[column.key], row, rowIndex)
+                        : row[column.key]
+                      }
+                    </div>
                   </td>
                 ))}
               </tr>

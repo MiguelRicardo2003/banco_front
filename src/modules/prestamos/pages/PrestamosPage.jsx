@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { usePrestamos } from '../hooks/usePrestamos';
-import Loading from '../../../shared/components/Loading';
+import Loading from '@shared/components/Loading';
+import Table from '@shared/components/Table';
+import { formatCurrency } from '@shared/utils/formatters';
 
 const Prestamos = () => {
   const [showModal, setShowModal] = useState(false);
@@ -88,44 +90,61 @@ const Prestamos = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Número</th>
-              <th>Cuenta</th>
-              <th>Cliente</th>
-              <th>Valor</th>
-              <th>Interés</th>
-              <th>Plazo</th>
-              <th>Cuota</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            {prestamos.map(prestamo => (
-              <tr key={prestamo.IdPrestamo}>
-                <td>{prestamo.IdPrestamo}</td>
-                <td className="font-semibold">{prestamo.Numero}</td>
-                <td>{prestamo.cuenta?.Numero || 'N/A'}</td>
-                <td>
-                  {prestamo.cuenta?.titulares?.map(t => t.Nombre).join(', ') || 'Sin titular'}
-                </td>
-                <td className="font-bold text-green-600">
-                  ${parseFloat(prestamo.Valor || 0).toLocaleString('es-CO')}
-                </td>
-                <td>{prestamo.Interes}%</td>
-                <td>{prestamo.Plazo} meses</td>
-                <td className="font-bold">
-                  ${parseFloat(prestamo.Cuota || 0).toLocaleString('es-CO')}
-                </td>
-                <td>{new Date(prestamo.Fecha).toLocaleDateString('es-ES')}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={[
+          { key: 'IdPrestamo', header: 'ID' },
+          { 
+            key: 'Numero', 
+            header: 'Número',
+            render: (value) => <span className="font-semibold">{value}</span>
+          },
+          { 
+            key: 'cuentaNumero', 
+            header: 'Cuenta',
+            render: (_, row) => row.cuenta?.Numero || 'N/A'
+          },
+          { 
+            key: 'cliente', 
+            header: 'Cliente',
+            render: (_, row) => row.cuenta?.titulares?.map(t => t.Nombre).join(', ') || 'Sin titular'
+          },
+          { 
+            key: 'Valor', 
+            header: 'Valor',
+            render: (value) => (
+              <span className="font-bold text-green-600">
+                {formatCurrency(value)}
+              </span>
+            )
+          },
+          { 
+            key: 'Interes', 
+            header: 'Interés',
+            render: (value) => `${value}%`
+          },
+          { 
+            key: 'Plazo', 
+            header: 'Plazo',
+            render: (value) => `${value} meses`
+          },
+          { 
+            key: 'Cuota', 
+            header: 'Cuota',
+            render: (value) => (
+              <span className="font-bold">
+                {formatCurrency(value)}
+              </span>
+            )
+          },
+          { 
+            key: 'Fecha', 
+            header: 'Fecha',
+            render: (value) => new Date(value).toLocaleDateString('es-ES')
+          }
+        ]}
+        data={prestamos}
+        emptyMessage="No hay préstamos disponibles"
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
