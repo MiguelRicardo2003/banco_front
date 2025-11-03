@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { cuentaService } from '../../cuentas/services/cuenta.service';
-import { movimientoService } from '../../movimientos/services/movimiento.service';
-import { prestamoService } from '../../prestamos/services/prestamo.service';
+import { cuentaService } from '@modules/cuentas/services/cuenta.service';
+import { movimientoService } from '@modules/movimientos/services/movimiento.service';
+import { prestamoService } from '@modules/prestamos/services/prestamo.service';
 
 export const useDashboard = () => {
   const [cuentas, setCuentas] = useState([]);
@@ -27,7 +27,8 @@ export const useDashboard = () => {
       setPrestamos(prestamosRes.data);
     } catch (err) {
       console.error('Error al cargar datos del dashboard:', err);
-      setError('Error al cargar los datos del dashboard');
+      const errorMessage = err.response?.data?.error || err.message || 'Error al cargar los datos del dashboard';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ export const useDashboard = () => {
     const data = [];
     cuentas.slice(0, 5).forEach(cuenta => {
       data.push({
-        name: cuenta.NumeroCuenta || 'N/A',
+        name: cuenta.Numero || 'N/A',
         saldo: parseFloat(cuenta.Saldo || 0)
       });
     });

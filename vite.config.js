@@ -15,7 +15,8 @@ export default defineConfig({
       '@core': path.resolve(__dirname, 'src/core'),
       '@components': path.resolve(__dirname, 'src/components'),
       '@modules': path.resolve(__dirname, 'src/modules'),
-      '@shared': path.resolve(__dirname, 'src/shared')
+      '@shared': path.resolve(__dirname, 'src/shared'),
+      '@services': path.resolve(__dirname, 'src/services')
     }
   },
 })
