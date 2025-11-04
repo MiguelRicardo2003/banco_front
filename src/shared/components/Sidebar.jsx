@@ -11,7 +11,8 @@ import {
   CreditCard,
   ArrowLeftRight,
   DollarSign,
-  Home
+  Home,
+  User
 } from 'lucide-react';
 import { ROUTES } from '@core/routes/AppRoutes';
 
@@ -52,6 +53,9 @@ const Sidebar = () => {
             <Link to={ROUTES.CIUDAD} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.CIUDAD) ? 'bg-bbva-light-blue' : ''}`}>
               <MapPin className="inline w-4 h-4 mr-2" /> Ciudad
             </Link>
+            <Link to={ROUTES.SUCURSAL} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.SUCURSAL) ? 'bg-bbva-light-blue' : ''}`}>
+              <Building2 className="inline w-4 h-4 mr-2" /> Sucursal
+            </Link>
             <Link to={ROUTES.TIPO_DOCUMENTO} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.TIPO_DOCUMENTO) ? 'bg-bbva-light-blue' : ''}`}>
               <FileText className="inline w-4 h-4 mr-2" /> Tipo Documento
             </Link>
@@ -81,6 +85,9 @@ const Sidebar = () => {
         </button>
         {openSection === 'operaciones' && (
           <div className="ml-6 mt-2 flex flex-col space-y-1">
+            <Link to={ROUTES.CUENTAHABIENTE} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.CUENTAHABIENTE) ? 'bg-bbva-light-blue' : ''}`}>
+              <User className="inline w-4 h-4 mr-2" /> Cuentahabientes
+            </Link>
             <Link to={ROUTES.CUENTAS} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.CUENTAS) ? 'bg-bbva-light-blue' : ''}`}>
               <CreditCard className="inline w-4 h-4 mr-2" /> Cuentas
             </Link>

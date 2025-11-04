@@ -1,4 +1,4 @@
-import apiClient from './api';
+import apiClient from '@core/services/api';
 
 export const sucursalService = {
   getAll: () => apiClient.get('/sucursales'),

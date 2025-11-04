@@ -19,15 +19,15 @@ const Movimientos = () => {
   const [filtroCuenta, setFiltroCuenta] = useState('');
 
   // Hook personalizado
-  const { movimientos, cuentas, loading, error, createMovimiento } = useMovimientos();
+  const { movimientos, cuentas, tiposMovimiento, sucursales, loading, error, createMovimiento } = useMovimientos();
 
   // React Hook Form
   const methods = useForm({
     defaultValues: {
       IdCuenta: '',
-      IdSucursal: 1,
+      IdSucursal: '',
       Valor: '',
-      IdTipoMovimiento: 1,
+      IdTipoMovimiento: '',
       Fecha: new Date().toISOString().split('T')[0],
       Descripcion: ''
     }
@@ -178,9 +178,24 @@ const Movimientos = () => {
                   label="Tipo de Movimiento"
                   rules={{ required: 'El tipo de movimiento es requerido' }}
                   options={[
-                    { value: 1, label: 'Deposito' },
-                    { value: 2, label: 'Retiro' },
-                    { value: 3, label: 'Transferencia' }
+                    { value: '', label: 'Seleccione un tipo' },
+                    ...(tiposMovimiento || []).map(tipo => ({
+                      value: tipo.IdTipoMovimiento,
+                      label: tipo.TipoMovimiento || 'Sin nombre'
+                    }))
+                  ]}
+                />
+
+                <FormSelect
+                  name="IdSucursal"
+                  label="Sucursal"
+                  rules={{ required: 'La sucursal es requerida' }}
+                  options={[
+                    { value: '', label: 'Seleccione una sucursal' },
+                    ...(sucursales || []).map(sucursal => ({
+                      value: sucursal.IdSucursal,
+                      label: `${sucursal.Sucursal}${sucursal.tipoSucursal ? ` - ${sucursal.tipoSucursal.TipoSucursal}` : ''}${sucursal.ciudad ? ` (${sucursal.ciudad.Ciudad})` : ''}`
+                    }))
                   ]}
                 />
 
@@ -225,7 +240,7 @@ const Movimientos = () => {
                   </Button>
                   <Button 
                     type="button" 
-                    variant="secondary"
+                    variant="danger"
                     className="flex-1"
                     onClick={() => {
                       setShowModal(false);

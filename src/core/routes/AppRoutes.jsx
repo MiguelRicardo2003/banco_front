@@ -5,6 +5,8 @@ import CuentasPage from '@modules/cuentas/pages/CuentasPage';
 import MovimientosPage from '@modules/movimientos/pages/MovimientosPage';
 import PrestamosPage from '@modules/prestamos/pages/PrestamosPage';
 import CiudadPage from '@modules/tablas-maestras/pages/CiudadPage';
+import CuentahabientePage from '@modules/tablas-maestras/pages/CuentahabientePage';
+import SucursalPage from '@modules/tablas-maestras/pages/SucursalPage';
 import TipoDocumentoPage from '@modules/tablas-maestras/pages/TipoDocumentoPage';
 import TipoCuentaPage from '@modules/tablas-maestras/pages/TipoCuentaPage';
 import TipoSucursalPage from '@modules/tablas-maestras/pages/TipoSucursalPage';
@@ -17,6 +19,8 @@ export const ROUTES = {
   MOVIMIENTOS: '/movimientos',
   PRESTAMOS: '/prestamos',
   CIUDAD: '/ciudades',
+  CUENTAHABIENTE: '/cuentahabientes',
+  SUCURSAL: '/sucursales',
   TIPO_DOCUMENTO: '/tipo-documentos',
   TIPO_CUENTA: '/tipo-cuentas',
   TIPO_SUCURSAL: '/tipo-sucursales',
@@ -35,6 +39,8 @@ const AppRoutes = () => {
         <Route path="/movimientos" element={<MovimientosPage />} />
         <Route path="/prestamos" element={<PrestamosPage />} />
         <Route path="/ciudades" element={<CiudadPage />} />
+        <Route path="/cuentahabientes" element={<CuentahabientePage />} />
+        <Route path="/sucursales" element={<SucursalPage />} />
         <Route path="/tipo-documentos" element={<TipoDocumentoPage />} />
         <Route path="/tipo-cuentas" element={<TipoCuentaPage />} />
         <Route path="/tipo-sucursales" element={<TipoSucursalPage />} />
