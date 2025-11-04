@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Eye } from 'lucide-react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCuentas } from '../hooks/useCuentas';
 import { tipoCuentaService } from '@services/tipoCuentaService';
@@ -12,18 +12,26 @@ import FormSelect from '@shared/components/FormSelect';
 import Loading from '@shared/components/Loading';
 import Table from '@shared/components/Table';
 import Modal from '@shared/components/Modal';
+import ConfirmModal from '@shared/components/ConfirmModal';
+import MessageModal from '@shared/components/MessageModal';
 import { formatCurrency } from '@shared/utils/formatters';
 
 const Cuentas = () => {
   const [filtro, setFiltro] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageModalContent, setMessageModalContent] = useState({ variant: 'success', message: '' });
+  const [deletingId, setDeletingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [tiposCuenta, setTiposCuenta] = useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [cuentahabientes, setCuentahabientes] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
   // Hook personalizado
-  const { cuentas, loading, error, createCuenta } = useCuentas();
+  const { cuentas, loading, error, createCuenta, updateCuenta, deleteCuenta } = useCuentas();
 
   // Cargar tipos de cuenta y sucursales
   useEffect(() => {
@@ -95,14 +103,72 @@ const Cuentas = () => {
   const { handleSubmit, reset, formState: { isSubmitting } } = methods;
 
   const onSubmit = async (data) => {
-    const result = await createCuenta(data);
+    const result = editing
+      ? await updateCuenta(editing.IdCuenta, data)
+      : await createCuenta(data);
+    
     if (result.success) {
-      toast.success('Cuenta creada exitosamente');
+      setMessageModalContent({
+        variant: 'success',
+        message: editing ? 'Cuenta actualizada exitosamente' : 'Cuenta creada exitosamente'
+      });
       setShowModal(false);
+      setShowMessageModal(true);
+      setEditing(null);
       reset();
     } else {
-      toast.error(result.error || 'Error al crear la cuenta');
+      setMessageModalContent({
+        variant: 'error',
+        message: result.error || (editing ? 'Error al actualizar la cuenta' : 'Error al crear la cuenta')
+      });
+      setShowMessageModal(true);
     }
+  };
+
+  const handleEdit = (cuenta) => {
+    setEditing(cuenta);
+    // Obtener el primer titular si existe
+    const primerTitular = cuenta.titulares && cuenta.titulares.length > 0 
+      ? cuenta.titulares[0].IdCuentahabiente 
+      : '';
+    
+    reset({
+      Numero: cuenta.Numero || '',
+      IdTipoCuenta: cuenta.IdTipoCuenta || '',
+      IdSucursal: cuenta.IdSucursal || '',
+      IdCuentahabiente: primerTitular,
+      Saldo: cuenta.Saldo || 0,
+      Sobregiro: cuenta.Sobregiro || 0,
+      FechaApertura: cuenta.FechaApertura || new Date().toISOString().split('T')[0]
+    });
+    setShowModal(true);
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeletingId(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    const result = await deleteCuenta(deletingId);
+    setIsDeleting(false);
+    setShowConfirmModal(false);
+
+    if (result.success) {
+      setMessageModalContent({
+        variant: 'success',
+        message: 'Cuenta eliminada exitosamente'
+      });
+      setShowMessageModal(true);
+    } else {
+      setMessageModalContent({
+        variant: 'error',
+        message: result.error || 'Error al eliminar la cuenta'
+      });
+      setShowMessageModal(true);
+    }
+    setDeletingId(null);
   };
 
   const cuentasFiltradas = cuentas.filter(cuenta =>
@@ -117,7 +183,22 @@ const Cuentas = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-bbva-blue">Cuentas</h1>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>
+        <button 
+          className="btn-primary" 
+          onClick={() => {
+            setEditing(null);
+            reset({
+              Numero: '',
+              IdTipoCuenta: '',
+              IdSucursal: '',
+              IdCuentahabiente: '',
+              Saldo: 0,
+              Sobregiro: 0,
+              FechaApertura: new Date().toISOString().split('T')[0]
+            });
+            setShowModal(true);
+          }}
+        >
           + Nueva Cuenta
         </button>
       </div>
@@ -209,12 +290,20 @@ const Cuentas = () => {
             key: 'actions',
             header: 'Acciones',
             render: (_, row) => (
-              <div className="flex gap-2 justify-center">
+              <div className="flex gap-2 items-center justify-center">
                 <button
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  title="Ver detalles"
+                  onClick={() => handleEdit(row)}
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center"
+                  title="Editar"
                 >
-                  <Eye className="w-4 h-4" />
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(row.IdCuenta)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center"
+                  title="Eliminar"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             )
@@ -228,9 +317,10 @@ const Cuentas = () => {
         isOpen={showModal}
         onClose={() => {
           setShowModal(false);
+          setEditing(null);
           reset();
         }}
-        title="Nueva Cuenta"
+        title={editing ? 'Editar Cuenta' : 'Nueva Cuenta'}
         size="md"
         footer={
           <div className="flex space-x-4 w-full">
@@ -252,7 +342,7 @@ const Cuentas = () => {
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Creando...' : 'Crear Cuenta'}
+              {isSubmitting ? (editing ? 'Actualizando...' : 'Creando...') : (editing ? 'Actualizar Cuenta' : 'Crear Cuenta')}
             </Button>
           </div>
         }
@@ -273,13 +363,11 @@ const Cuentas = () => {
               name="IdTipoCuenta"
               label="Tipo de Cuenta"
               rules={{ required: 'El tipo de cuenta es requerido' }}
-              options={[
-                { value: '', label: loadingOptions ? 'Cargando...' : (tiposCuenta.length === 0 ? 'No hay tipos disponibles' : 'Seleccione un tipo') },
-                ...(Array.isArray(tiposCuenta) && tiposCuenta.length > 0 ? tiposCuenta.map(tipo => ({
-                  value: tipo.IdTipoCuenta,
-                  label: tipo.TipoCuenta || 'Sin nombre'
-                })) : [])
-              ]}
+              placeholder={loadingOptions ? 'Cargando...' : (tiposCuenta.length === 0 ? 'No hay tipos disponibles' : 'Seleccione un tipo')}
+              options={Array.isArray(tiposCuenta) && tiposCuenta.length > 0 ? tiposCuenta.map(tipo => ({
+                value: tipo.IdTipoCuenta,
+                label: tipo.TipoCuenta || 'Sin nombre'
+              })) : []}
               disabled={loadingOptions}
             />
 
@@ -287,29 +375,27 @@ const Cuentas = () => {
               name="IdSucursal"
               label="Sucursal"
               rules={{ required: 'La sucursal es requerida' }}
-              options={[
-                { value: '', label: loadingOptions ? 'Cargando...' : (sucursales.length === 0 ? 'No hay sucursales disponibles' : 'Seleccione una sucursal') },
-                ...(Array.isArray(sucursales) && sucursales.length > 0 ? sucursales.map(sucursal => {
-                  // Manejar diferentes posibles nombres de campos (tipoSucursal, tiposucursal, etc.)
-                  const tipoSucursal = sucursal.tipoSucursal || sucursal.tiposucursal || null;
-                  const ciudad = sucursal.ciudad || null;
-                  const nombreTipo = tipoSucursal?.TipoSucursal || tipoSucursal?.tiposucursal || '';
-                  const nombreCiudad = ciudad?.Ciudad || ciudad?.ciudad || '';
-                  
-                  let label = sucursal.Sucursal || sucursal.sucursal || 'Sin nombre';
-                  if (nombreTipo) {
-                    label += ` - ${nombreTipo}`;
-                  }
-                  if (nombreCiudad) {
-                    label += ` (${nombreCiudad})`;
-                  }
-                  
-                  return {
-                    value: sucursal.IdSucursal || sucursal.idsucursal,
-                    label: label
-                  };
-                }) : [])
-              ]}
+              placeholder={loadingOptions ? 'Cargando...' : (sucursales.length === 0 ? 'No hay sucursales disponibles' : 'Seleccione una sucursal')}
+              options={Array.isArray(sucursales) && sucursales.length > 0 ? sucursales.map(sucursal => {
+                // Manejar diferentes posibles nombres de campos (tipoSucursal, tiposucursal, etc.)
+                const tipoSucursal = sucursal.tipoSucursal || sucursal.tiposucursal || null;
+                const ciudad = sucursal.ciudad || null;
+                const nombreTipo = tipoSucursal?.TipoSucursal || tipoSucursal?.tiposucursal || '';
+                const nombreCiudad = ciudad?.Ciudad || ciudad?.ciudad || '';
+                
+                let label = sucursal.Sucursal || sucursal.sucursal || 'Sin nombre';
+                if (nombreTipo) {
+                  label += ` - ${nombreTipo}`;
+                }
+                if (nombreCiudad) {
+                  label += ` (${nombreCiudad})`;
+                }
+                
+                return {
+                  value: sucursal.IdSucursal || sucursal.idsucursal,
+                  label: label
+                };
+              }) : []}
               disabled={loadingOptions}
             />
 
@@ -317,13 +403,11 @@ const Cuentas = () => {
               name="IdCuentahabiente"
               label="Cuentahabiente (Titular)"
               rules={{ required: 'El cuentahabiente titular es requerido' }}
-              options={[
-                { value: '', label: loadingOptions ? 'Cargando...' : (cuentahabientes.length === 0 ? 'No hay cuentahabientes disponibles' : 'Seleccione un cuentahabiente') },
-                ...(Array.isArray(cuentahabientes) && cuentahabientes.length > 0 ? cuentahabientes.map(ch => ({
-                  value: ch.IdCuentahabiente,
-                  label: `${ch.Nombre} - ${ch.tipoDocumento?.Sigla || ch.tipoDocumento?.TipoDocumento || ''} ${ch.Documento}`
-                })) : [])
-              ]}
+              placeholder={loadingOptions ? 'Cargando...' : (cuentahabientes.length === 0 ? 'No hay cuentahabientes disponibles' : 'Seleccione un cuentahabiente')}
+              options={Array.isArray(cuentahabientes) && cuentahabientes.length > 0 ? cuentahabientes.map(ch => ({
+                value: ch.IdCuentahabiente,
+                label: `${ch.Nombre} - ${ch.tipoDocumento?.Sigla || ch.tipoDocumento?.TipoDocumento || ''} ${ch.Documento}`
+              })) : []}
               disabled={loadingOptions}
             />
 
@@ -361,6 +445,28 @@ const Cuentas = () => {
           </form>
         </FormProvider>
       </Modal>
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setDeletingId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar eliminación"
+        message="¿Está seguro de que desea eliminar esta cuenta? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={isDeleting}
+      />
+
+      <MessageModal
+        isOpen={showMessageModal}
+        onClose={() => setShowMessageModal(false)}
+        message={messageModalContent.message}
+        variant={messageModalContent.variant}
+      />
     </div>
   );
 };
