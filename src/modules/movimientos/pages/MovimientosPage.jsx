@@ -78,9 +78,19 @@ const Movimientos = () => {
       key: 'tipoMovimiento', 
       header: 'Tipo',
       render: (value, row) => {
-        const variants = { 1: 'success', 2: 'danger', 3: 'info' };
+        const tipoMovimientoNombre = value?.TipoMovimiento?.toLowerCase() || '';
+        let variant = 'info'; // Por defecto
+        
+        if (tipoMovimientoNombre.includes('depósito') || tipoMovimientoNombre.includes('deposito')) {
+          variant = 'success';
+        } else if (tipoMovimientoNombre.includes('retiro')) {
+          variant = 'danger';
+        } else if (tipoMovimientoNombre.includes('transferencia')) {
+          variant = 'info';
+        }
+        
         return (
-          <Badge variant={variants[row.IdTipoMovimiento]} size="sm">
+          <Badge variant={variant} size="sm">
             {value?.TipoMovimiento || 'N/A'}
           </Badge>
         );
@@ -90,10 +100,11 @@ const Movimientos = () => {
       key: 'Valor', 
       header: 'Valor',
       render: (value, row) => {
-        const isPositive = row.IdTipoMovimiento === 1;
+        const tipoMovimientoNombre = row.tipoMovimiento?.TipoMovimiento?.toLowerCase() || '';
+        const isDeposito = tipoMovimientoNombre.includes('depósito') || tipoMovimientoNombre.includes('deposito');
         return (
-          <span className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {isPositive ? '+' : '-'}{formatCurrency(value)}
+          <span className={`font-bold ${isDeposito ? 'text-green-600' : 'text-red-600'}`}>
+            {isDeposito ? '+' : '-'}{formatCurrency(value)}
           </span>
         );
       }

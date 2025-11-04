@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { movimientoService } from '../services/movimiento.service';
 import { cuentaService } from '../../cuentas/services/cuenta.service';
-import { tipoMovimientoService } from '@services/tipoMovimientoService';
-import { sucursalService } from '@services/sucursalService';
+import { tipoMovimientoService } from '@modules/tablas-maestras/services/tipoMovimiento.service';
+import { sucursalService } from '@modules/tablas-maestras/services/sucursal.service';
 
 export const useMovimientos = () => {
   const [movimientos, setMovimientos] = useState([]);

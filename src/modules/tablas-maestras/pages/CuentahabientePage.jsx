@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import { useCuentahabiente } from '@modules/tablas-maestras/hooks/useCuentahabiente';
-import { ciudadService } from '@services/ciudadService';
-import { tipoDocumentoService } from '@services/tipoDocumentoService';
+import { ciudadService } from '../services/ciudad.service';
+import { tipoDocumentoService } from '../services/tipoDocumento.service';
 import Table from '@shared/components/Table';
 import Loading from '@shared/components/Loading';
 import Modal from '@shared/components/Modal';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { sucursalService } from '@services/sucursalService.js';
+import { sucursalService } from '../services/sucursal.service.js';
 
 export const useSucursal = () => {
   const [sucursales, setSucursales] = useState([]);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tipoDocumentoService } from '@services/tipoDocumentoService.js';
+import { tipoDocumentoService } from '../services/tipoDocumento.service.js';
 
 export const useTipoDocumento = () => {
   const [tipos, setTipos] = useState([]);

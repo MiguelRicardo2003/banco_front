@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import { useSucursal } from '@modules/tablas-maestras/hooks/useSucursal';
-import { ciudadService } from '@services/ciudadService';
-import { tipoSucursalService } from '@services/tipoSucursalService';
+import { ciudadService } from '../services/ciudad.service';
+import { tipoSucursalService } from '../services/tipoSucursal.service';
 import Table from '@shared/components/Table';
 import Loading from '@shared/components/Loading';
 import Modal from '@shared/components/Modal';

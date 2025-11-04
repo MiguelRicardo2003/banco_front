@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ciudadService } from '@services/ciudadService.js';
+import { ciudadService } from '../services/ciudad.service.js';
 
 export const useCiudad = () => {
   const [ciudades, setCiudades] = useState([]);

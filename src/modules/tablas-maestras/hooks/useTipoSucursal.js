@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tipoSucursalService } from '@services/tipoSucursalService.js';
+import { tipoSucursalService } from '../services/tipoSucursal.service.js';
 
 export const useTipoSucursal = () => {
   const [tipos, setTipos] = useState([]);
