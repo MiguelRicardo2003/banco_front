@@ -27,7 +27,7 @@ const Sidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <aside className="w-64 bg-bbva-blue text-white min-h-screen shadow-xl p-4">
+    <aside className="w-64 bg-bbva-blue text-white h-full shadow-xl p-4 overflow-y-auto">
       <h2 className="text-xl font-bold mb-6 text-center">Menú Principal</h2>
 
       <Link 

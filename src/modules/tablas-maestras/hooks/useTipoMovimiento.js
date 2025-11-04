@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tipoMovimientoService } from '@services/tipoMovimientoService.js';
+import { tipoMovimientoService } from '../services/tipoMovimiento.service.js';
 
 export const useTipoMovimiento = () => {
   const [tipos, setTipos] = useState([]);

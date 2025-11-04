@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cuentahabienteService } from '@services/cuentahabienteService.js';
+import { cuentahabienteService } from '../services/cuentahabiente.service.js';
 
 export const useCuentahabiente = () => {
   const [cuentahabientes, setCuentahabientes] = useState([]);
