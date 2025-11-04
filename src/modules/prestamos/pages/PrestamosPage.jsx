@@ -92,7 +92,11 @@ const Prestamos = () => {
 
       <Table
         columns={[
-          { key: 'IdPrestamo', header: 'ID' },
+          { 
+            key: 'IdPrestamo', 
+            header: 'ID',
+            render: (value, row, index) => index + 1
+          },
           { 
             key: 'Numero', 
             header: 'Número',

@@ -59,7 +59,11 @@ const Movimientos = () => {
 
   // Configuración de columnas para la tabla
   const tableColumns = [
-    { key: 'IdMovimiento', header: 'ID' },
+    { 
+      key: 'IdMovimiento', 
+      header: 'ID',
+      render: (value, row, index) => index + 1
+    },
     { 
       key: 'Fecha', 
       header: 'Fecha',
@@ -153,108 +157,106 @@ const Movimientos = () => {
         emptyMessage="No hay movimientos disponibles"
       />
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-bbva-blue mb-6">Nuevo Movimiento</h2>
-            
-            <FormProvider {...methods}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <FormSelect
-                  name="IdCuenta"
-                  label="Cuenta"
-                  rules={{ required: 'La cuenta es requerida' }}
-                  options={[
-                    { value: '', label: 'Seleccione una cuenta' },
-                    ...(cuentas || []).map(cuenta => ({
-                      value: cuenta.IdCuenta,
-                      label: `${cuenta.Numero} - Saldo: ${formatCurrency(cuenta.Saldo)}`
-                    }))
-                  ]}
-                />
-
-                <FormSelect
-                  name="IdTipoMovimiento"
-                  label="Tipo de Movimiento"
-                  rules={{ required: 'El tipo de movimiento es requerido' }}
-                  options={[
-                    { value: '', label: 'Seleccione un tipo' },
-                    ...(tiposMovimiento || []).map(tipo => ({
-                      value: tipo.IdTipoMovimiento,
-                      label: tipo.TipoMovimiento || 'Sin nombre'
-                    }))
-                  ]}
-                />
-
-                <FormSelect
-                  name="IdSucursal"
-                  label="Sucursal"
-                  rules={{ required: 'La sucursal es requerida' }}
-                  options={[
-                    { value: '', label: 'Seleccione una sucursal' },
-                    ...(sucursales || []).map(sucursal => ({
-                      value: sucursal.IdSucursal,
-                      label: `${sucursal.Sucursal}${sucursal.tipoSucursal ? ` - ${sucursal.tipoSucursal.TipoSucursal}` : ''}${sucursal.ciudad ? ` (${sucursal.ciudad.Ciudad})` : ''}`
-                    }))
-                  ]}
-                />
-
-                <FormInput
-                  name="Valor"
-                  type="number"
-                  label="Valor"
-                  placeholder="0.00"
-                  rules={{ 
-                    required: 'El valor es requerido',
-                    min: { value: 0.01, message: 'El valor debe ser mayor a 0' }
-                  }}
-                  step="0.01"
-                />
-
-                <Controller
-                  name="Descripcion"
-                  control={methods.control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Descripción
-                      </label>
-                      <textarea
-                        {...field}
-                        className="input-field"
-                        rows={3}
-                        placeholder="Descripción del movimiento (opcional)"
-                      />
-                    </div>
-                  )}
-                />
-
-                <div className="flex space-x-4 pt-4">
-                  <Button 
-                    type="submit" 
-                    variant="primary" 
-                    className="flex-1"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Registrando...' : 'Registrar'}
-                  </Button>
-                  <Button 
-                    type="button" 
-                    variant="danger"
-                    className="flex-1"
-                    onClick={() => {
-                      setShowModal(false);
-                      reset();
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            </FormProvider>
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          reset();
+        }}
+        title="Nuevo Movimiento"
+        size="md"
+        footer={
+          <div className="flex space-x-4 w-full">
+            <Button 
+              type="button" 
+              variant="danger"
+              className="flex-1"
+              onClick={() => {
+                setShowModal(false);
+                reset();
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="button" 
+              variant="primary" 
+              className="flex-1"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Registrando...' : 'Registrar'}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormSelect
+              name="IdCuenta"
+              label="Cuenta"
+              rules={{ required: 'La cuenta es requerida' }}
+              placeholder="Seleccione una cuenta"
+              options={(cuentas || []).map(cuenta => ({
+                value: cuenta.IdCuenta,
+                label: `${cuenta.Numero} - Saldo: ${formatCurrency(cuenta.Saldo)}`
+              }))}
+            />
+
+            <FormSelect
+              name="IdTipoMovimiento"
+              label="Tipo de Movimiento"
+              rules={{ required: 'El tipo de movimiento es requerido' }}
+              placeholder="Seleccione un tipo"
+              options={(tiposMovimiento || []).map(tipo => ({
+                value: tipo.IdTipoMovimiento,
+                label: tipo.TipoMovimiento || 'Sin nombre'
+              }))}
+            />
+
+            <FormSelect
+              name="IdSucursal"
+              label="Sucursal"
+              rules={{ required: 'La sucursal es requerida' }}
+              placeholder="Seleccione una sucursal"
+              options={(sucursales || []).map(sucursal => ({
+                value: sucursal.IdSucursal,
+                label: `${sucursal.Sucursal}${sucursal.tipoSucursal ? ` - ${sucursal.tipoSucursal.TipoSucursal}` : ''}${sucursal.ciudad ? ` (${sucursal.ciudad.Ciudad})` : ''}`
+              }))}
+            />
+
+            <FormInput
+              name="Valor"
+              type="number"
+              label="Valor"
+              placeholder="0.00"
+              rules={{ 
+                required: 'El valor es requerido',
+                min: { value: 0.01, message: 'El valor debe ser mayor a 0' }
+              }}
+              step="0.01"
+            />
+
+            <Controller
+              name="Descripcion"
+              control={methods.control}
+              render={({ field }) => (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Descripción
+                  </label>
+                  <textarea
+                    {...field}
+                    className="input-field"
+                    rows={3}
+                    placeholder="Descripción del movimiento (opcional)"
+                  />
+                </div>
+              )}
+            />
+          </form>
+        </FormProvider>
+      </Modal>
     </div>
   );
 };
