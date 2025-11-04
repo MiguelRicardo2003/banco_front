@@ -148,7 +148,7 @@ const TipoCuentaPage = () => {
         title={editing ? 'Editar' : 'Nuevo'}
         footer={
           <div className="flex gap-3">
-            <Button variant="secondary" onClick={() => {
+            <Button variant="danger" onClick={() => {
               setShowModal(false);
               setEditing(null);
               setFormData({ TipoCuenta: '', Sobregiro: '' });

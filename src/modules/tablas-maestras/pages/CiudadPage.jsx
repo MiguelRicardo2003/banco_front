@@ -141,7 +141,7 @@ const CiudadPage = () => {
         footer={
           <div className="flex gap-3">
             <Button
-              variant="secondary"
+              variant="danger"
               onClick={() => {
                 setShowModal(false);
                 setEditing(null);

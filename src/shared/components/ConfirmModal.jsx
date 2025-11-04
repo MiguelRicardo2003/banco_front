@@ -39,7 +39,7 @@ const ConfirmModal = ({
       footer={
         <div className="flex gap-3 justify-end">
           <Button
-            variant="secondary"
+            variant="danger"
             onClick={onClose}
             disabled={loading}
           >
