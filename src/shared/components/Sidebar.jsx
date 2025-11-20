@@ -12,7 +12,8 @@ import {
   ArrowLeftRight,
   DollarSign,
   Home,
-  User
+  User,
+  Users
 } from 'lucide-react';
 import { ROUTES } from '@core/routes/AppRoutes';
 
@@ -96,6 +97,9 @@ const Sidebar = () => {
             </Link>
             <Link to={ROUTES.PRESTAMOS} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.PRESTAMOS) ? 'bg-bbva-light-blue' : ''}`}>
               <DollarSign className="inline w-4 h-4 mr-2" /> Préstamos
+            </Link>
+            <Link to={ROUTES.TITULARES} className={`hover:bg-bbva-light-blue rounded px-2 py-1 ${isActive(ROUTES.TITULARES) ? 'bg-bbva-light-blue' : ''}`}>
+              <Users className="inline w-4 h-4 mr-2" /> Titulares
             </Link>
           </div>
         )}

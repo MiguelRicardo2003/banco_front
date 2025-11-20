@@ -11,6 +11,7 @@ import TipoDocumentoPage from '@modules/tablas-maestras/pages/TipoDocumentoPage'
 import TipoCuentaPage from '@modules/tablas-maestras/pages/TipoCuentaPage';
 import TipoSucursalPage from '@modules/tablas-maestras/pages/TipoSucursalPage';
 import TipoMovimientoPage from '@modules/tablas-maestras/pages/TipoMovimientoPage';
+import TitularesPage from '@modules/titulares/pages/TitularesPage';
 
 export const ROUTES = {
   HOME: '/',
@@ -25,6 +26,7 @@ export const ROUTES = {
   TIPO_CUENTA: '/tipo-cuentas',
   TIPO_SUCURSAL: '/tipo-sucursales',
   TIPO_MOVIMIENTO: '/tipo-movimientos',
+  TITULARES: '/titulares',
   NOT_FOUND: '*'
 };
 
@@ -45,6 +47,7 @@ const AppRoutes = () => {
         <Route path="/tipo-cuentas" element={<TipoCuentaPage />} />
         <Route path="/tipo-sucursales" element={<TipoSucursalPage />} />
         <Route path="/tipo-movimientos" element={<TipoMovimientoPage />} />
+        <Route path="/titulares" element={<TitularesPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
