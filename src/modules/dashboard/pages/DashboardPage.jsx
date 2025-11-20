@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useDashboard } from '../hooks/useDashboard';
-import StatCard from '../../../shared/components/StatCard';
-import Card from '../../../shared/components/Card';
-import Table from '../../../shared/components/Table';
-import Loading from '../../../shared/components/Loading';
-import { formatCurrency } from '../../../shared/utils/formatters';
-import { formatShortDate } from '../../../shared/utils/formatters';
+import { useDashboard } from '@modules/dashboard/hooks/useDashboard';
+import StatCard from '@shared/components/StatCard';
+import Card from '@shared/components/Card';
+import Table from '@shared/components/Table';
+import Loading from '@shared/components/Loading';
+import { formatCurrency } from '@shared/utils/formatters';
+import { formatShortDate } from '@shared/utils/formatters';
 
 const Dashboard = () => {
   // Hook personalizado
@@ -60,7 +60,18 @@ const Dashboard = () => {
   ];
 
   if (loading) return <Loading />;
-  if (error) return <div className="text-red-600">{error}</div>;
+  if (error) return (
+    <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+      <p className="font-bold">Error:</p>
+      <p>{error}</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="mt-4 px-4 py-2 bg-bbva-blue text-white rounded hover:bg-bbva-light-blue"
+      >
+        Recargar
+      </button>
+    </div>
+  );
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,4 @@
-import apiClient from './api';
+import apiClient from '@core/services/api';
 
 export const prestamoService = {
   getAll: () => apiClient.get('/prestamos'),

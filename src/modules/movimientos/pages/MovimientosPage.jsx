@@ -2,16 +2,16 @@ import { useState, useMemo } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useMovimientos } from '../hooks/useMovimientos';
-import Modal from '../../../shared/components/Modal';
-import Button from '../../../shared/components/Button';
-import Card from '../../../shared/components/Card';
-import Table from '../../../shared/components/Table';
-import Badge from '../../../shared/components/Badge';
-import FormInput from '../../../shared/components/FormInput';
-import FormSelect from '../../../shared/components/FormSelect';
-import Loading from '../../../shared/components/Loading';
-import { formatCurrency } from '../../../shared/utils/formatters';
-import { formatShortDate } from '../../../shared/utils/formatters';
+import Modal from '@shared/components/Modal';
+import Button from '@shared/components/Button';
+import Card from '@shared/components/Card';
+import Table from '@shared/components/Table';
+import Badge from '@shared/components/Badge';
+import FormInput from '@shared/components/FormInput';
+import FormSelect from '@shared/components/FormSelect';
+import Loading from '@shared/components/Loading';
+import { formatCurrency } from '@shared/utils/formatters';
+import { formatShortDate } from '@shared/utils/formatters';
 
 const Movimientos = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,15 +19,15 @@ const Movimientos = () => {
   const [filtroCuenta, setFiltroCuenta] = useState('');
 
   // Hook personalizado
-  const { movimientos, cuentas, loading, error, createMovimiento } = useMovimientos();
+  const { movimientos, cuentas, tiposMovimiento, sucursales, loading, error, createMovimiento } = useMovimientos();
 
   // React Hook Form
   const methods = useForm({
     defaultValues: {
       IdCuenta: '',
-      IdSucursal: 1,
+      IdSucursal: '',
       Valor: '',
-      IdTipoMovimiento: 1,
+      IdTipoMovimiento: '',
       Fecha: new Date().toISOString().split('T')[0],
       Descripcion: ''
     }
@@ -59,7 +59,11 @@ const Movimientos = () => {
 
   // Configuración de columnas para la tabla
   const tableColumns = [
-    { key: 'IdMovimiento', header: 'ID' },
+    { 
+      key: 'IdMovimiento', 
+      header: 'ID',
+      render: (value, row, index) => index + 1
+    },
     { 
       key: 'Fecha', 
       header: 'Fecha',
@@ -74,9 +78,19 @@ const Movimientos = () => {
       key: 'tipoMovimiento', 
       header: 'Tipo',
       render: (value, row) => {
-        const variants = { 1: 'success', 2: 'danger', 3: 'info' };
+        const tipoMovimientoNombre = value?.TipoMovimiento?.toLowerCase() || '';
+        let variant = 'info'; // Por defecto
+        
+        if (tipoMovimientoNombre.includes('depósito') || tipoMovimientoNombre.includes('deposito')) {
+          variant = 'success';
+        } else if (tipoMovimientoNombre.includes('retiro')) {
+          variant = 'danger';
+        } else if (tipoMovimientoNombre.includes('transferencia')) {
+          variant = 'info';
+        }
+        
         return (
-          <Badge variant={variants[row.IdTipoMovimiento]} size="sm">
+          <Badge variant={variant} size="sm">
             {value?.TipoMovimiento || 'N/A'}
           </Badge>
         );
@@ -86,10 +100,11 @@ const Movimientos = () => {
       key: 'Valor', 
       header: 'Valor',
       render: (value, row) => {
-        const isPositive = row.IdTipoMovimiento === 1;
+        const tipoMovimientoNombre = row.tipoMovimiento?.TipoMovimiento?.toLowerCase() || '';
+        const isDeposito = tipoMovimientoNombre.includes('depósito') || tipoMovimientoNombre.includes('deposito');
         return (
-          <span className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {isPositive ? '+' : '-'}{formatCurrency(value)}
+          <span className={`font-bold ${isDeposito ? 'text-green-600' : 'text-red-600'}`}>
+            {isDeposito ? '+' : '-'}{formatCurrency(value)}
           </span>
         );
       }
@@ -147,133 +162,112 @@ const Movimientos = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Cuenta</th>
-              <th>Tipo</th>
-              <th>Valor</th>
-              <th>Sucursal</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movimientosFiltrados.map(mov => (
-              <tr key={mov.IdMovimiento}>
-                <td>{mov.IdMovimiento}</td>
-                <td>{new Date(mov.Fecha).toLocaleDateString('es-ES')}</td>
-                <td className="font-semibold">{mov.cuenta?.Numero || 'N/A'}</td>
-                <td>
-                  <span className={`px-2 py-1 rounded text-xs font-semibold
-                    ${mov.IdTipoMovimiento === 1 ? 'bg-green-100 text-green-800' : ''}
-                    ${mov.IdTipoMovimiento === 2 ? 'bg-red-100 text-red-800' : ''}
-                    ${mov.IdTipoMovimiento === 3 ? 'bg-blue-100 text-blue-800' : ''}
-                  `}>
-                    {mov.tipoMovimiento?.TipoMovimiento || 'N/A'}
-                  </span>
-                </td>
-                <td className={`font-bold ${mov.IdTipoMovimiento === 1 ? 'text-green-600' : 'text-red-600'}`}>
-                  {mov.IdTipoMovimiento === 1 ? '+' : '-'}
-                  ${parseFloat(mov.Valor || 0).toLocaleString('es-CO')}
-                </td>
-                <td>{mov.sucursal?.Sucursal || 'N/A'}</td>
-                <td className="text-sm text-gray-600">{mov.Descripcion || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={tableColumns}
+        data={movimientosFiltrados}
+        emptyMessage="No hay movimientos disponibles"
+      />
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-bbva-blue mb-6">Nuevo Movimiento</h2>
-            
-            <FormProvider {...methods}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <FormSelect
-                  name="IdCuenta"
-                  label="Cuenta"
-                  rules={{ required: 'La cuenta es requerida' }}
-                  options={[
-                    { value: '', label: 'Seleccione una cuenta' },
-                    ...(cuentas || []).map(cuenta => ({
-                      value: cuenta.IdCuenta,
-                      label: `${cuenta.Numero} - Saldo: ${formatCurrency(cuenta.Saldo)}`
-                    }))
-                  ]}
-                />
-
-                <FormSelect
-                  name="IdTipoMovimiento"
-                  label="Tipo de Movimiento"
-                  rules={{ required: 'El tipo de movimiento es requerido' }}
-                  options={[
-                    { value: 1, label: 'Deposito' },
-                    { value: 2, label: 'Retiro' },
-                    { value: 3, label: 'Transferencia' }
-                  ]}
-                />
-
-                <FormInput
-                  name="Valor"
-                  type="number"
-                  label="Valor"
-                  placeholder="0.00"
-                  rules={{ 
-                    required: 'El valor es requerido',
-                    min: { value: 0.01, message: 'El valor debe ser mayor a 0' }
-                  }}
-                  step="0.01"
-                />
-
-                <Controller
-                  name="Descripcion"
-                  control={methods.control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Descripción
-                      </label>
-                      <textarea
-                        {...field}
-                        className="input-field"
-                        rows={3}
-                        placeholder="Descripción del movimiento (opcional)"
-                      />
-                    </div>
-                  )}
-                />
-
-                <div className="flex space-x-4 pt-4">
-                  <Button 
-                    type="submit" 
-                    variant="primary" 
-                    className="flex-1"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Registrando...' : 'Registrar'}
-                  </Button>
-                  <Button 
-                    type="button" 
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={() => {
-                      setShowModal(false);
-                      reset();
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            </FormProvider>
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          reset();
+        }}
+        title="Nuevo Movimiento"
+        size="md"
+        footer={
+          <div className="flex space-x-4 w-full">
+            <Button 
+              type="button" 
+              variant="danger"
+              className="flex-1"
+              onClick={() => {
+                setShowModal(false);
+                reset();
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="button" 
+              variant="primary" 
+              className="flex-1"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Registrando...' : 'Registrar'}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormSelect
+              name="IdCuenta"
+              label="Cuenta"
+              rules={{ required: 'La cuenta es requerida' }}
+              placeholder="Seleccione una cuenta"
+              options={(cuentas || []).map(cuenta => ({
+                value: cuenta.IdCuenta,
+                label: `${cuenta.Numero} - Saldo: ${formatCurrency(cuenta.Saldo)}`
+              }))}
+            />
+
+            <FormSelect
+              name="IdTipoMovimiento"
+              label="Tipo de Movimiento"
+              rules={{ required: 'El tipo de movimiento es requerido' }}
+              placeholder="Seleccione un tipo"
+              options={(tiposMovimiento || []).map(tipo => ({
+                value: tipo.IdTipoMovimiento,
+                label: tipo.TipoMovimiento || 'Sin nombre'
+              }))}
+            />
+
+            <FormSelect
+              name="IdSucursal"
+              label="Sucursal"
+              rules={{ required: 'La sucursal es requerida' }}
+              placeholder="Seleccione una sucursal"
+              options={(sucursales || []).map(sucursal => ({
+                value: sucursal.IdSucursal,
+                label: `${sucursal.Sucursal}${sucursal.tipoSucursal ? ` - ${sucursal.tipoSucursal.TipoSucursal}` : ''}${sucursal.ciudad ? ` (${sucursal.ciudad.Ciudad})` : ''}`
+              }))}
+            />
+
+            <FormInput
+              name="Valor"
+              type="number"
+              label="Valor"
+              placeholder="0.00"
+              rules={{ 
+                required: 'El valor es requerido',
+                min: { value: 0.01, message: 'El valor debe ser mayor a 0' }
+              }}
+              step="0.01"
+            />
+
+            <Controller
+              name="Descripcion"
+              control={methods.control}
+              render={({ field }) => (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Descripción
+                  </label>
+                  <textarea
+                    {...field}
+                    className="input-field"
+                    rows={3}
+                    placeholder="Descripción del movimiento (opcional)"
+                  />
+                </div>
+              )}
+            />
+          </form>
+        </FormProvider>
+      </Modal>
     </div>
   );
 };
